@@ -1,0 +1,11 @@
+[
+  {
+    "event_id": "fr",
+    "op": "reference-release",
+    "id": "bad",
+    "ref": "missing",
+    "uid": "unknown",
+    "termination_receipt": "x",
+    "delete_receipt": "y"
+  }
+]

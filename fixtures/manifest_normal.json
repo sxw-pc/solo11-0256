@@ -1,0 +1,9 @@
+[
+  {
+    "event_id": "m1",
+    "op": "manifest-register",
+    "id": "manifest-1",
+    "arch": "amd64",
+    "digest": "sha:m1"
+  }
+]

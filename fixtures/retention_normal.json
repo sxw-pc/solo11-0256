@@ -1,0 +1,12 @@
+[
+  {
+    "event_id": "r1",
+    "op": "workload-reference",
+    "id": "ref-1",
+    "pod": "pod-a",
+    "uid": "uid-1",
+    "manifest": "manifest-1",
+    "node": "node-a",
+    "generation": 1
+  }
+]

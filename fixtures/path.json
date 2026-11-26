@@ -1,0 +1,161 @@
+[
+  {
+    "command": "manifest",
+    "input": {
+      "event_id": "m1",
+      "op": "manifest-register",
+      "id": "manifest-1",
+      "arch": "amd64",
+      "digest": "sha:m1"
+    }
+  },
+  {
+    "command": "manifest",
+    "input": {
+      "event_id": "m2",
+      "op": "manifest-register",
+      "id": "manifest-2",
+      "arch": "amd64",
+      "digest": "sha:m2"
+    }
+  },
+  {
+    "command": "manifest",
+    "input": {
+      "event_id": "m3",
+      "op": "layer-deduplicate",
+      "id": "layer-1",
+      "manifest": "manifest-1",
+      "arch": "amd64",
+      "digest": "sha:layer",
+      "size": 100
+    }
+  },
+  {
+    "command": "manifest",
+    "input": {
+      "event_id": "m4",
+      "op": "layer-deduplicate",
+      "id": "layer-2",
+      "manifest": "manifest-2",
+      "arch": "amd64",
+      "digest": "sha:layer",
+      "size": 100
+    }
+  },
+  {
+    "command": "eviction",
+    "input": {
+      "event_id": "e1",
+      "op": "cache-record",
+      "node": "node-a",
+      "layer": "layer-1"
+    }
+  },
+  {
+    "command": "retention",
+    "input": {
+      "event_id": "r1",
+      "op": "workload-reference",
+      "id": "ref-1",
+      "pod": "pod-a",
+      "uid": "uid-1",
+      "manifest": "manifest-1",
+      "node": "node-a",
+      "generation": 1
+    }
+  },
+  {
+    "command": "retention",
+    "input": {
+      "event_id": "r2",
+      "op": "offline-retain",
+      "id": "lease-1",
+      "manifest": "manifest-2",
+      "node": "node-a",
+      "start": 10,
+      "expires": 20,
+      "approver": "owner-a"
+    }
+  },
+  {
+    "command": "eviction",
+    "input": {
+      "event_id": "e2",
+      "op": "eviction-plan",
+      "id": "plan-1",
+      "node": "node-a",
+      "layer": "layer-1",
+      "needed": 50,
+      "at": 12
+    }
+  },
+  {
+    "command": "manifest",
+    "input": {
+      "event_id": "m5",
+      "op": "manifest-revoke",
+      "id": "manifest-2"
+    }
+  },
+  {
+    "command": "retention",
+    "input": {
+      "event_id": "r3",
+      "op": "reference-release",
+      "id": "release-1",
+      "ref": "ref-1",
+      "uid": "uid-2",
+      "termination_receipt": "term",
+      "delete_receipt": "delete"
+    }
+  },
+  {
+    "command": "retention",
+    "input": {
+      "event_id": "r4",
+      "op": "reference-release",
+      "id": "release-2",
+      "ref": "ref-1",
+      "uid": "uid-1",
+      "termination_receipt": "term",
+      "delete_receipt": "delete"
+    }
+  },
+  {
+    "command": "eviction",
+    "input": {
+      "event_id": "e3",
+      "op": "eviction-plan",
+      "id": "plan-2",
+      "node": "node-a",
+      "layer": "layer-1",
+      "needed": 50,
+      "at": 21
+    }
+  },
+  {
+    "command": "eviction",
+    "input": {
+      "event_id": "e4",
+      "op": "delete-reconcile",
+      "id": "delete-1",
+      "plan": "plan-2",
+      "layer": "layer-1",
+      "at": 21,
+      "success": false
+    }
+  },
+  {
+    "command": "eviction",
+    "input": {
+      "event_id": "e5",
+      "op": "delete-reconcile",
+      "id": "delete-2",
+      "plan": "plan-2",
+      "layer": "layer-1",
+      "at": 22,
+      "success": true
+    }
+  }
+]

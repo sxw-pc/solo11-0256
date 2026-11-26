@@ -1,0 +1,11 @@
+[
+  {
+    "event_id": "fm",
+    "op": "layer-deduplicate",
+    "id": "bad",
+    "manifest": "missing",
+    "arch": "amd64",
+    "digest": "bad",
+    "size": 10
+  }
+]

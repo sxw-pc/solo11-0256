@@ -1,0 +1,8 @@
+[
+  {
+    "event_id": "e1",
+    "op": "cache-record",
+    "node": "node-a",
+    "layer": "layer-1"
+  }
+]
