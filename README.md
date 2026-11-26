@@ -9,3 +9,10 @@
 
 
 运行 `python -m layercourt demo --db demo.sqlite` 与 `python -m unittest discover -s tests -v`。
+
+
+## 离线发布审批与缓存结算
+
+- `rollout --op node-enroll` 登记节点架构。`rollout --op wave-approve` 验证一组节点的架构和逐节点层齐备性，全部就绪才写入发布批次和节点席位。
+- `chargeback --op tenant-link` 给活跃工作负载引用分配租户。`chargeback --op statement-close` 对指定节点的驻留层关账。同一层对当前引用它的不同租户平分字节，余数按租户名称分配。一次关账结果随后由归档台账固定。
+- 两套入口沿用 `--db`、`--fixture` / `--input` 和原始事件回放。回归样例见 `tests/test_rollout_chargeback.py`。
