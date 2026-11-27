@@ -28,15 +28,23 @@ def tx(db):
         db.execute('ROLLBACK')
         raise
 
-def run(db,command,x):
+def apply(db,command,x):
+    """Validate/deduplicate one event and mutate projections without opening a transaction.
+
+    Callers that need several events to commit atomically wrap repeated ``apply``
+    calls in :func:`tx`.  Event format and idempotency are identical to :func:`run`.
+    """
     from . import MODULES
+    old=one(db,'SELECT * FROM events WHERE event_id=?',(x['event_id'],))
+    encoded=json.dumps(x,sort_keys=True,ensure_ascii=False)
+    if old:return json.loads(old['result']) if old['input']==encoded and old['command']==command else {'decision':'event_identity_conflict'}
+    result=MODULES[command].handle(db,x)
+    db.execute('INSERT INTO events(command,event_id,input,result) VALUES(?,?,?,?)',(command,x['event_id'],encoded,json.dumps(result,sort_keys=True,ensure_ascii=False)))
+    return result
+
+def run(db,command,x):
     with tx(db):
-        old=one(db,'SELECT * FROM events WHERE event_id=?',(x['event_id'],))
-        encoded=json.dumps(x,sort_keys=True,ensure_ascii=False)
-        if old:return json.loads(old['result']) if old['input']==encoded and old['command']==command else {'decision':'event_identity_conflict'}
-        result=MODULES[command].handle(db,x)
-        db.execute('INSERT INTO events(command,event_id,input,result) VALUES(?,?,?,?)',(command,x['event_id'],encoded,json.dumps(result,sort_keys=True,ensure_ascii=False)))
-        return result
+        return apply(db,command,x)
 
 def replay(path):
     original=connect(path)

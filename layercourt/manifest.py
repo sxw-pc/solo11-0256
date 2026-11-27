@@ -3,6 +3,7 @@ SCHEMA='''
 CREATE TABLE IF NOT EXISTS manifests(id TEXT PRIMARY KEY,arch TEXT,digest TEXT,status TEXT);
 CREATE TABLE IF NOT EXISTS layers(id TEXT PRIMARY KEY,digest TEXT,size INTEGER,arch TEXT);
 CREATE TABLE IF NOT EXISTS manifest_edges(manifest TEXT,layer TEXT,PRIMARY KEY(manifest,layer));
+CREATE TABLE IF NOT EXISTS layer_aliases(alias TEXT PRIMARY KEY,canonical TEXT NOT NULL);
 '''
 def handle(db,x):
  op=x['op']
@@ -20,6 +21,7 @@ def handle(db,x):
   if layer and layer['size']!=x['size']:return {'decision':'digest_size_conflict'}
   lid=layer['id'] if layer else x['id']
   if not layer:db.execute('INSERT INTO layers VALUES(?,?,?,?)',(lid,x['digest'],x['size'],x['arch']))
+  elif x['id']!=lid:db.execute('INSERT OR IGNORE INTO layer_aliases VALUES(?,?)',(x['id'],lid))
   db.execute('INSERT OR IGNORE INTO manifest_edges VALUES(?,?)',(x['manifest'],lid))
   return {'decision':'layer_shared' if layer else 'layer_recorded','layer':lid}
  if op=='manifest-revoke':

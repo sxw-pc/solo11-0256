@@ -14,8 +14,13 @@ def handle(db,x):
  op=x['op']
  if op=='cache-record':
   layer=one(db,'SELECT * FROM layers WHERE id=?',(x['layer'],))
+  layer_id=x['layer']
+  if not layer:
+   alias=one(db,'SELECT canonical FROM layer_aliases WHERE alias=?',(x['layer'],)) if 'layer_aliases' in {r['name'] for r in rows(db,"SELECT name FROM sqlite_master WHERE type='table'")} else None
+   if alias:
+    layer_id=alias['canonical'];layer=one(db,'SELECT * FROM layers WHERE id=?',(layer_id,))
   if not layer:return {'decision':'unknown_layer'}
-  db.execute("INSERT INTO node_caches VALUES(?,?,'present') ON CONFLICT(node,layer) DO UPDATE SET status='present'",(x['node'],x['layer']))
+  db.execute("INSERT INTO node_caches VALUES(?,?,'present') ON CONFLICT(node,layer) DO UPDATE SET status='present'",(x['node'],layer_id))
   return {'decision':'cache_present'}
  if op=='eviction-plan':
   cache=one(db,'SELECT * FROM node_caches WHERE node=? AND layer=?',(x['node'],x['layer']))
