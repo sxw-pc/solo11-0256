@@ -29,4 +29,9 @@ def handle(db,x):
   db.execute('INSERT INTO lease_claims VALUES(?,?,?,?,?,?,?)',(x['id'],ref['id'],ref['uid'],'release',x['termination_receipt'],x['delete_receipt'],'accepted'))
   db.execute("UPDATE workload_refs SET status='released' WHERE id=?",(ref['id'],))
   return {'decision':'reference_released'}
+ # Retirement evidence registration / settlement lives in its own module; the
+ # retention entry forwards those operations so callers may keep one command.
+ from . import retirement
+ if op in retirement.OPERATIONS:
+  return retirement.handle(db,x)
  return {'decision':'unknown_operation'}
