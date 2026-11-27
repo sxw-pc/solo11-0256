@@ -1,4 +1,4 @@
-from .store import one
+from .store import one,rows
 SCHEMA='''
 CREATE TABLE IF NOT EXISTS workload_refs(id TEXT PRIMARY KEY,pod TEXT,uid TEXT,manifest TEXT,node TEXT,generation INTEGER,status TEXT);
 CREATE TABLE IF NOT EXISTS retention_leases(id TEXT PRIMARY KEY,manifest TEXT,node TEXT,start INTEGER,expires INTEGER,approver TEXT,status TEXT);
@@ -18,7 +18,13 @@ def handle(db,x):
   m=one(db,'SELECT * FROM manifests WHERE id=?',(x['manifest'],))
   if not m or m['status']!='active' or x['expires']<=x['start'] or not x.get('approver'):return {'decision':'lease_denied'}
   closure=one(db,'SELECT COUNT(*) n FROM manifest_edges WHERE manifest=?',(x['manifest'],))['n']
-  cached=one(db,"SELECT COUNT(*) n FROM manifest_edges e JOIN node_caches c ON c.layer=e.layer AND c.node=? AND c.status='present' WHERE e.manifest=?",(x['node'],x['manifest']))['n']
+  edges=[r['layer'] for r in rows(db,'SELECT layer FROM manifest_edges WHERE manifest=?',(x['manifest'],))]
+  from .inventory import resident_layers
+  proven=resident_layers(db,x['node'])
+  if proven is None:
+   cached=one(db,"SELECT COUNT(*) n FROM manifest_edges e JOIN node_caches c ON c.layer=e.layer AND c.node=? AND c.status='present' WHERE e.manifest=?",(x['node'],x['manifest']))['n']
+  else:
+   cached=sum(1 for lid in edges if lid in proven)
   if closure==0 or cached!=closure:return {'decision':'offline_closure_missing','required':closure,'present':cached}
   db.execute('INSERT INTO retention_leases VALUES(?,?,?,?,?,?,?)',(x['id'],x['manifest'],x['node'],x['start'],x['expires'],x['approver'],'active'))
   return {'decision':'lease_active'}

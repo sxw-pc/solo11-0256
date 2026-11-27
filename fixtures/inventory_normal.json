@@ -1,0 +1,25 @@
+[
+  {
+    "event_id": "inv-g",
+    "op": "storage-generation",
+    "node": "node-a",
+    "generation": 1,
+    "at": 1
+  },
+  {
+    "event_id": "inv-online",
+    "op": "inventory-attest",
+    "id": "att-normal",
+    "node": "node-a",
+    "generation": 1,
+    "mode": "live",
+    "scope": ["layer-1"],
+    "fragments": [
+      {"id": "fa", "generation": 1, "dir": "A", "cut": 20, "layers": []},
+      {"id": "fb", "generation": 1, "dir": "B", "cut": 23, "layers": []}
+    ],
+    "moves": [
+      {"id": "mv", "generation": 1, "layer": "layer-1", "src": "B", "dst": "A", "src_cut": 21, "dst_cut": 22, "arrived": true}
+    ]
+  }
+]

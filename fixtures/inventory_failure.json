@@ -1,0 +1,13 @@
+[
+  {
+    "event_id": "inv-fail",
+    "op": "inventory-attest",
+    "id": "att-failure",
+    "node": "node-missing",
+    "generation": 1,
+    "mode": "frozen",
+    "fragments": [
+      {"id": "fa", "generation": 1, "dir": "A", "cut": 1, "layers": []}
+    ]
+  }
+]
